@@ -7,13 +7,8 @@ namespace PhoneCase.Shared.Dtos.ResponseDtos;
 
 public class ResponseDto<T>
 {
-[JsonProperty("data")]
 public T Data { get; set; } = default!;
-
-[JsonProperty("success")]
 public bool IsSuccessful { get; set; }
-
-[JsonProperty("errors")]
 public List<string> Errors { get; set; } = [];
 
 [JsonIgnore]

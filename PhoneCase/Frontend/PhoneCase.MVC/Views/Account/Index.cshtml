@@ -1,0 +1,74 @@
+@model List<OrderDto>
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+<div class="product_image_area container mt-4">
+    <div class="w-100 d-flex align-items-center justify-content-between">
+        <h3 id="head_title" class="fw-bold mb-3">Siparişlerim</h3>
+        <div>
+            <a asp-area="" asp-controller="Account" asp-action="Index" asp-route-orderstatus=@null
+                class="btn btn-warning">Tümü</a>
+            @foreach (SelectListItem orderStatus in ViewBag.OrderStatusList)
+            {
+                <a asp-area="" asp-controller="Account" asp-action="Index" asp-route-orderstatus="@orderStatus.Value"
+                    asp-route-isdeleted=@false
+                    class="btn @(orderStatus.Selected ? "btn-success" : "btn-primary")">@orderStatus.Text</a>
+            }
+        </div>
+    </div>
+
+    <div class="accordion mt-3" id="orders">
+        @foreach (OrderDto order in Model)
+        {
+            <div class="card">
+                <div class="card-header" id="order-title-@order.Id">
+                    <h2 class="mb-0">
+                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                            data-target="#order-details-@order.Id" aria-expanded="false"
+                            aria-controls="order-details-@order.Id">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td width="75">@order.Id</td>
+                                        <td width="120">@order.OrderDate</td>
+                                        <td width="100">@order.OrderStatus</td>
+                                        <td width="200">@($"{order.TotalAmount:C0}")</td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </button>
+                    </h2>
+                </div>
+
+                <div id="order-details-@order.Id" class="collapse" aria-labelledby="order-title-@order.Id"
+                    data-parent="#orders">
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped table-success">
+                            <thead>
+                                <tr class="bg-danger text-white">
+                                    <th>Ürün</th>
+                                    <th>Adet</th>
+                                    <th>Fiyat</th>
+                                    <th>Tutar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (OrderItemDto orderItem in order.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@orderItem.ProductName</td>
+                                        <td>@orderItem.Quantity</td>
+                                        <td>@($"{orderItem.UnitPrice:C0}")</td>
+                                        <td>@($"{orderItem.ItemAmount:C0}")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>

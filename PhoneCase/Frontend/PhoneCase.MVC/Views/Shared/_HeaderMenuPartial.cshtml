@@ -12,7 +12,7 @@
     <ul class="dropdown-menu">
         @if (User.Identity?.IsAuthenticated == true)
         {
-            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Auth" asp-action="MyProfile">Profilim</a>
+            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Account" asp-action="Index">Profilim</a>
             </li>
             @if(User.IsInRole("Admin"))
             {

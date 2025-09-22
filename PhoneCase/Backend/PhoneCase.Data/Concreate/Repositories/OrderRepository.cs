@@ -14,8 +14,8 @@ public class OrderRepository : IOrderRepository
     }
     public decimal GetOrdersTotal(OrderFiltersDto orderFiltersDto)
     {
-                var query = _appDbContext.Orders.AsQueryable();
-        
+        var query = _appDbContext.Orders.AsQueryable();
+
         if (orderFiltersDto.OrderStatus.HasValue)
         {
             query = query.Where(o => o.OrderStatus == orderFiltersDto.OrderStatus.Value);
@@ -25,6 +25,12 @@ public class OrderRepository : IOrderRepository
         {
             query = query.Where(o => o.UserId == orderFiltersDto.UserId);
         }
+
+        if (orderFiltersDto.IsDeleted.HasValue)
+        {
+            query = query.Where(o => o.IsDeleted == orderFiltersDto.IsDeleted.Value);
+        }
+
 
         if (orderFiltersDto.StartDate.HasValue)
         {
@@ -36,10 +42,6 @@ public class OrderRepository : IOrderRepository
             query = query.Where(o => o.CreatedAt <= orderFiltersDto.EndDate.Value);
         }
 
-        if (orderFiltersDto.IsDeleted.HasValue)
-        {
-            query = query.Where(o => o.IsDeleted == orderFiltersDto.IsDeleted.Value);
-        }
 
         var total = query
            .SelectMany(o => o.OrderItems)
