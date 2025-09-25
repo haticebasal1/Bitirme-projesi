@@ -30,15 +30,11 @@ public async Task<IActionResult> Index()
         var authResult = await _httpContextAccessor.HttpContext!.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         var token = authResult.Properties?.Items["access_token"];
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        // 1. Ürün Sayısı
         var response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
         var responseContent = await response.Content.ReadAsStringAsync();
         var result = JsonConvert.DeserializeObject<ResponseDto<int>>(responseContent);
         model.ProductCount = result!.Data;
-
-        // 2. Kategori Sayısı
         request = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5289/categories/count");
         response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
@@ -46,10 +42,10 @@ public async Task<IActionResult> Index()
         result = JsonConvert.DeserializeObject<ResponseDto<int>>(responseContent);
         model.CategoryCount = result!.Data;
 
-        // 3. Sipariş Toplamı (BUG FIXED)
+
         var startDate = DateTime.Now.Date.ToString("yyyy-MM-dd");
         var endDate = DateTime.Now.Date.AddDays(1).ToString("yyyy-MM-dd");
-        var url = $"http://localhost:5289/orders/total?startDate={startDate}&endDate={endDate}";
+        var url = $"http://localhost:5289/orders/total?StartDate={startDate}&EndDate={endDate}";
         request = new HttpRequestMessage(HttpMethod.Get, url);
 
         response = await client.SendAsync(request);

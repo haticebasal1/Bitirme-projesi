@@ -135,7 +135,6 @@ public class OrderManager : IOrderService
             return ResponseDto<IEnumerable<OrderDto>>.Fail($"Beklenmedik Hata: {ex.Message}", StatusCodes.Status500InternalServerError);
         }
     }
-
     public async Task<ResponseDto<OrderDto>> GetMyOrderAsync(int id, string userId)
     {
         try
@@ -218,8 +217,11 @@ public class OrderManager : IOrderService
             }
             orderNowDto.OrderItems.Clear();
             orderNowDto.OrderItems = orderItems;
+
             var order = _mapper.Map<Order>(orderNowDto);
+
             await _orderRepository.AddAsync(order);
+
             var result = await _unitOfWork.SaveAsync();
             if (result < 1)
             {

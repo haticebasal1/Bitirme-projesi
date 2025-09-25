@@ -50,8 +50,14 @@ public class CartManager : ICartService
             );
             if (cart is null)
             {
-                return ResponseDto<CartItemDto>.Fail("Kullanıcıya ait sepet bulunamadığı için eklenemedi!", StatusCodes.Status404NotFound);
+                cart = new Cart(addToCartDto.UserId);
+                await _cartRepository.AddAsync(cart);
+                if (await _unitOfWork.SaveAsync() < 1)
+                {
+                    return ResponseDto<CartItemDto>.Fail("Sepet oluşturulamadı!", StatusCodes.Status500InternalServerError);
+                }
             }
+
             var existsCartItem = cart.CartItems.FirstOrDefault(x => x.ProductId == addToCartDto.ProductId);
             CartItemDto cartItemDto = null!;
             if (existsCartItem is not null)
@@ -159,46 +165,47 @@ public class CartManager : ICartService
         }
     }
 
-public async Task<ResponseDto<CartDto>> GetCartAsync(string userId)
-{
-    try
+    public async Task<ResponseDto<CartDto>> GetCartAsync(string userId)
     {
-        var cart = await _cartRepository.GetAsync(
-              predicate: x => x.UserId == userId,
-              includes: query => query.Include(x => x.CartItems).ThenInclude(y => y.Product)
-          );
-
-        if (cart is null)
+        try
         {
-            return ResponseDto<CartDto>.Fail("Kullanıcıya ait sepet bulunamadı!", StatusCodes.Status404NotFound);
-        }
+            var cart = await _cartRepository.GetAsync(
+                  predicate: x => x.UserId == userId,
+                  includes: query => query.Include(x => x.CartItems).ThenInclude(y => y.Product)
+              );
 
-        // AutoMapper yerine manuel map
-        var cartDto = new CartDto
-        {
-            Id = cart.Id,
-            UserId = cart.UserId,
-            CartItems = cart.CartItems.Select(ci => new CartItemDto
+            if (cart is null)
             {
-                Id = ci.Id,
-                Quantity = ci.Quantity,
-                Product = new ProductDto
+                return ResponseDto<CartDto>.Fail("Kullanıcıya ait sepet bulunamadı!", StatusCodes.Status404NotFound);
+            }
+            var cartDto = new CartDto
+            {
+                Id = cart.Id,
+                UserId = cart.UserId,
+                CartItems = cart.CartItems.Select(ci => new CartItemDto
                 {
-                    Id = ci.Product!.Id,
-                    Name = ci.Product.Name,
-                    Price = ci.Product.Price,
-                     ImageUrl = ci.Product.ImageUrl
-                }
-            }).ToList()
-        };
+                    Id = ci.Id,
+                    CartId = ci.CartId,
+                    ProductId = ci.ProductId,
+                    Quantity = ci.Quantity,
+                    Product = new ProductDto
+                    {
+                        Id = ci.Product!.Id,
+                        Name = ci.Product.Name,
+                        Price = ci.Product.Price,
+                        ImageUrl = ci.Product.ImageUrl
+                    }
+                }).ToList()
+            };
 
-        return ResponseDto<CartDto>.Success(cartDto, StatusCodes.Status200OK);
+            return ResponseDto<CartDto>.Success(cartDto, StatusCodes.Status200OK);
+        }
+        catch (Exception ex)
+        {
+            return ResponseDto<CartDto>.Fail($"Beklenmedik Hata:{ex.Message}", StatusCodes.Status500InternalServerError);
+        }
     }
-    catch (Exception ex)
-    {
-        return ResponseDto<CartDto>.Fail($"Beklenmedik Hata:{ex.Message}", StatusCodes.Status500InternalServerError);
-    }
-}
+
 
     public async Task<ResponseDto<NoContentDto>> RemoveFromCartAsync(int cartItemId)
     {

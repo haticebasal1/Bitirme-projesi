@@ -17,14 +17,14 @@
                         <div class="single_product_slider text-center position-relative">
                             <!-- Ürün Resmi -->
                             <img src="http://localhost:5289/images/@p.ImageUrl" alt="@p.Name"
-                                style="width:250px;height:250px;object-fit:cover;margin:auto;" />
+                                 style="width:250px;height:250px;object-fit:cover;margin:auto;" />
 
                             <!-- Favori Butonu (sağ alt köşe) -->
                             <form asp-controller="Favorite" asp-action="Add" method="post"
-                                class="position-absolute bottom-2 end-0 m-2">
+                                  class="position-absolute bottom-2 end-0 m-2">
                                 <input type="hidden" name="productId" value="@p.Id" />
                                 <button type="submit" class="btn btn-light rounded-circle p-2 shadow-sm"
-                                    title="Favorilere Ekle">
+                                        title="Favorilere Ekle">
                                     <i class="ti-heart text-danger fs-5"></i>
                                 </button>
                             </form>
@@ -41,7 +41,7 @@
                                 </form>
 
                                 <form asp-area="" asp-controller="Product" asp-action="Details" asp-route-id="@p.Id.ToString()"
-                                    method="get" style="display:inline;">
+                                      method="get" style="display:inline;">
                                     <button type="submit" class="btn-custom btn-sm">Detay</button>
                                 </form>
                             </div>
@@ -65,14 +65,14 @@
                         <div class="single_product_slider text-center position-relative">
                             <!-- Ürün Resmi -->
                             <img src="http://localhost:5289/images/@p.ImageUrl" alt="@p.Name"
-                                style="width:262.5px;height:262.5px;object-fit:cover;margin:auto;" />
+                                 style="width:262.5px;height:262.5px;object-fit:cover;margin:auto;" />
 
                             <!-- Favori Butonu (sağ alt köşe) -->
                             <form asp-controller="Favorite" asp-action="Add" method="post"
-                                class="position-absolute bottom-2 end-0 m-2">
+                                  class="position-absolute bottom-2 end-0 m-2">
                                 <input type="hidden" name="productId" value="@p.Id" />
                                 <button type="submit" class="btn btn-light rounded-circle p-2 shadow-sm"
-                                    title="Favorilere Ekle">
+                                        title="Favorilere Ekle">
                                     <i class="ti-heart text-danger fs-5"></i>
                                 </button>
                             </form>
@@ -89,7 +89,7 @@
                                 </form>
 
                                 <form asp-area="" asp-controller="Product" asp-action="Details" asp-route-id="@p.Id.ToString()"
-                                    method="get" style="display:inline;">
+                                      method="get" style="display:inline;">
                                     <button type="submit" class="btn-custom btn-sm">Detay</button>
                                 </form>
                             </div>
@@ -116,11 +116,11 @@ else
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4 text-center position-relative">
                         <!-- Ürün Resmi -->
                         <img src="http://localhost:5289/images/@p.ImageUrl" alt="@p.Name" class="img-fluid"
-                            style="width:100%;height:262.5px;object-fit:cover;margin:auto;" />
+                             style="width:100%;height:262.5px;object-fit:cover;margin:auto;" />
 
                         <!-- Favori Butonu (sağ alt köşe) -->
                         <form asp-controller="Favorite" asp-action="Add" method="post"
-                            class="position-absolute bottom-2 end-0 m-2">
+                              class="position-absolute bottom-2 end-0 m-2">
                             <input type="hidden" name="productId" value="@p.Id" />
                             <button type="submit" class="btn btn-light rounded-circle p-2 shadow-sm" title="Favorilere Ekle">
                                 <i class="ti-heart text-danger fs-5"></i>
@@ -141,7 +141,7 @@ else
                             </form>
 
                             <form asp-area="" asp-controller="Product" asp-action="Details" asp-route-id="@p.Id.ToString()"
-                                method="get" style="display:inline;">
+                                  method="get" style="display:inline;">
                                 <button type="submit" class="btn-custom btn-sm">Detay</button>
                             </form>
                         </div>

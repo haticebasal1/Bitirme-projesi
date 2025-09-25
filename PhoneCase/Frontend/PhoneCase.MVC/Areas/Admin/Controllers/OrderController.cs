@@ -13,6 +13,7 @@ using PhoneCase.Shared.Dtos.OrderDtos;
 
 namespace PhoneCase.MVC.Areas.Admin.Controllers;
 
+
 [Area("Admin")]
 [Authorize(Roles = "Admin")]
 public class OrderController : Controller
@@ -26,64 +27,43 @@ public class OrderController : Controller
         _toastr = toastr;
     }
 
-    public async Task<IActionResult> Index([FromQuery] OrderStatus? orderstatus, [FromQuery] string? applicationUserId, [FromQuery] DateTime startDate, [FromQuery] DateTime? endDate, [FromQuery] bool? isDeleted)
+    public async Task<IActionResult> Index([FromQuery] OrderStatus? orderStatus, [FromQuery] string? applicationUserId, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] bool? isDeleted)
     {
-        ViewBag.OrderStatusList = GetOrderStatuses(orderstatus);
-        ViewBag.GetOrderStatusesSelectList = new Func<OrderStatus, List<SelectListItem>>(status =>
-        {
-            return GetOrderStatuses(status);
-        });
+        ViewBag.OrderStatusList = GetOrderStatuses(orderStatus);
+        ViewBag.GetOrderStatusesSelectList = new Func<OrderStatus?, List<SelectListItem>>(GetOrderStatuses);
+
 
         var client = new HttpClient();
-        var query = new List<string>();
-
-        if (orderstatus.HasValue)
-            query.Add($"OrderStatus={orderstatus}");
-
-        if (!string.IsNullOrEmpty(applicationUserId))
-            query.Add($"UserId={applicationUserId}");
-
-        if (startDate != default)
-            query.Add($"StartDate={startDate:O}");
-
-        if (endDate.HasValue)
-            query.Add($"EndDate={endDate:O}");
-
-        if (isDeleted.HasValue)
-            query.Add($"IsDeleted={isDeleted}");
-
-        var url = "http://localhost:5289/orders/getall";
-        if (query.Any())
-            url += "?" + string.Join("&", query);
-
+        var url = $"http://localhost:5289/orders/all?OrderStatus={orderStatus}&UserId={applicationUserId}&StartDate={startDate}&EndDate={endDate}&IsDeleted={isDeleted}";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-
         try
         {
             var authResult = await _httpContextAccessor.HttpContext!.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var token = authResult.Properties?.Items["access_token"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
             var response = await client.SendAsync(request);
             var responseContent = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ResponseDto<List<OrderDto>>>(responseContent);
 
             if (!result!.IsSuccessful)
             {
-                _toastr.AddErrorToastMessage(result!.Errors[0]);
-                return View(result!.Data);
+                var errorMessage = result.Errors.FirstOrDefault() ?? "Bir hata oluştu.";
+                _toastr.AddErrorToastMessage(errorMessage);
             }
 
-            return View(result!.Data);
+            return View(result.Data);
+
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Hata:{ex.Message}");
+            Console.WriteLine($"Hata: {ex.Message}");
             throw;
         }
     }
+
+
     [HttpPut]
-    public async Task<IActionResult> ChangeOrderStatus(int orderId, OrderStatus orderstatus)
+    public async Task<IActionResult> ChangeOrderStatus(int orderId, OrderStatus orderStatus)
     {
         var client = new HttpClient();
         try
@@ -91,22 +71,15 @@ public class OrderController : Controller
             var authResult = await _httpContextAccessor.HttpContext!.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             var token = authResult.Properties?.Items["access_token"];
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            ChangeOrderStatusDto changeOrderStatusDto = new()
-            {
-                OrderId = orderId,
-                OrderStatus = orderstatus
-            };
 
-            var content = new StringContent(JsonConvert.SerializeObject(changeOrderStatusDto));
-            var response = await client.PutAsync($"http://localhost:5289/orders{orderId}?orderStatus={orderstatus}", null);
-
+            var response = await client.PutAsync($"http://localhost:5289/orders/{orderId}?orderStatus={orderStatus}", null);
             var responseContent = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<ResponseDto<NoContentDto>>(responseContent);
             return Json(result);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Hata:{ex.Message}");
+            Console.WriteLine($"Hata: {ex.Message}");
             throw;
         }
     }
@@ -123,9 +96,6 @@ public class OrderController : Controller
 
             var response = await client.SendAsync(request);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var responseContent1 = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("API Response: " + responseContent);
-
             var result = JsonConvert.DeserializeObject<ResponseDto<OrderDto>>(responseContent);
             if (!result!.IsSuccessful)
             {
@@ -136,14 +106,15 @@ public class OrderController : Controller
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Hata: {ex.Message}");
+            Console.WriteLine($"Hata:{ex.Message}");
             throw;
         }
     }
 
+
     public async Task<IActionResult> Cancel(int id)
     {
-               var client = new HttpClient();
+        var client = new HttpClient();
         try
         {
             var authResult = await _httpContextAccessor.HttpContext!.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -158,7 +129,7 @@ public class OrderController : Controller
                 _toastr.AddErrorToastMessage(result!.Errors[0]);
             }
             _toastr.AddSuccessToastMessage("İşlem başarılı!");
-            return RedirectToAction(nameof(Index),new {IsDeleted=false}); 
+            return RedirectToAction(nameof(Index), new { IsDeleted = false });
         }
         catch (Exception ex)
         {

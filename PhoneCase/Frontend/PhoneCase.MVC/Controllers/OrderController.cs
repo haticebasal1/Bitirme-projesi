@@ -103,14 +103,34 @@ public class OrderController : Controller
 
             var cart = cartResult.Data;
 
-            // Sepetteki ürünleri OrderNowDto'ya aktar
-            orderNowDto.OrderItems = cart.CartItems.Select(x => new OrderItemCreateDto
+            // Sepet içeriğini logla
+            foreach (var item in cart.CartItems)
             {
-                ProductId = x.ProductId,
-                Quantity = x.Quantity,
-                UnitPrice = x.Product!.Price,
-                Product = x.Product
-            }).ToList();
+                Console.WriteLine(
+                    $"CartItem => CartId: {item.CartId}, ProductId: {item.ProductId}, " +
+                    $"Product?.Id: {item.Product?.Id}, Product Null?: {item.Product == null}"
+                );
+            }
+
+            // Geçerli ürünleri filtrele
+            var validCartItems = cart.CartItems
+                .Where(x => x.ProductId > 0 && x.Product != null)
+                .ToList();
+
+            if (!validCartItems.Any())
+            {
+                Console.WriteLine("Sepette geçerli ürün yok!");
+                return Redirect("Confirmation");
+            }
+
+            // Sipariş için gerekli alanları set et
+            orderNowDto.OrderItems = validCartItems
+                .Select(x => new OrderItemCreateDto
+                {
+                    ProductId = x.ProductId,
+                    Quantity = x.Quantity,
+                    UnitPrice = x.Product!.Price
+                }).ToList();
 
             // Siparişi API'ye gönder
             var jsonContent = JsonConvert.SerializeObject(orderNowDto);

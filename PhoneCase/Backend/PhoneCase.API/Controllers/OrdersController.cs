@@ -73,7 +73,7 @@ namespace PhoneCase.API.Controllers
             var response = await _orderManager.CancelOrderAsync(orderId);
             return CreateResult(response);
         }
-        [HttpGet("getall")]
+        [HttpGet("all")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllOrders([FromQuery] OrderFiltersDto? orderFiltersDto)
         {
