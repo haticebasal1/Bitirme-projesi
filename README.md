@@ -16,6 +16,7 @@ Bu proje, .NET 8 platformu üzerinde MVC (Model-View-Controller) mimarisi kullan
 📍 Gelişmiş Sepet ve Sipariş Akışı: Sepete ürün ekleme/çıkarma, adet güncelleme, fatura/adres bilgilerinin girilmesi ve sipariş tamamlama simülasyonu.
 
 👑 Yönetim Paneli (Admin Panel)
+
 📍 Özet Gösterge Paneli (Dashboard): Aktif ürün sayısı, kategori sayısı, toplam sipariş miktarı gibi istatistiklerin grafiksel ve sayısal takibi.
 
 📍 Kategori Yönetimi: Yeni kategori oluşturma, güncelleme, silme ve resim yükleme işlemleri.
